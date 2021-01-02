@@ -20,7 +20,7 @@ import Logo from '../../assets/logo.png';
 const Home: React.FC = () => {
   const navigation = useNavigation();
 
-  async function handleNavigate(): Promise<void> {
+  function handleNavigate(): void {
     navigation.navigate('MainBottom', {
       screen: 'Dashboard',
     });
@@ -38,7 +38,7 @@ const Home: React.FC = () => {
         <Image source={Logo} />
         <Title>Uma verdadeira experiência Italiana.</Title>
       </Container>
-      <NavigationButton onPress={() => handleNavigate()}>
+      <NavigationButton onPress={handleNavigate}>
         <ButtonText>Entrar no Restaurant</ButtonText>
         <IconContainer>
           <Icon name="log-in" size={24} color="#7A1818" />
