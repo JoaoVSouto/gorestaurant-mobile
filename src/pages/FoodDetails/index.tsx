@@ -55,7 +55,9 @@ interface Food {
   name: string;
   description: string;
   price: number;
+  category: number;
   image_url: string;
+  thumbnail_url: string;
   formattedPrice: string;
   extras: Extra[];
 }
@@ -88,6 +90,23 @@ const FoodDetails: React.FC = () => {
     loadFood();
   }, [routeParams]);
 
+  useEffect(() => {
+    async function loadIsFavorite(): Promise<void> {
+      const { data: favoritesData } = await api.get(
+        `favorites/${routeParams.id}`,
+      );
+
+      if (favoritesData.id) {
+        setIsFavorite(true);
+        return;
+      }
+
+      setIsFavorite(false);
+    }
+
+    loadIsFavorite();
+  }, [routeParams]);
+
   function handleIncrementExtra(id: number): void {
     setExtras(state =>
       state.map(extra => ({
@@ -117,8 +136,23 @@ const FoodDetails: React.FC = () => {
     setFoodQuantity(state => (state > 1 ? state - 1 : state));
   }
 
-  const toggleFavorite = useCallback(() => {
-    // Toggle if food is favorite or not
+  const toggleFavorite = useCallback(async () => {
+    setIsFavorite(!isFavorite);
+
+    if (!isFavorite) {
+      await api.post('favorites', {
+        id: food.id,
+        name: food.name,
+        description: food.description,
+        price: food.price,
+        category: food.category,
+        image_url: food.image_url,
+        thumbnail_url: food.thumbnail_url,
+      });
+      return;
+    }
+
+    await api.delete(`favorites/${food.id}`);
   }, [isFavorite, food]);
 
   const cartTotal = useMemo(() => {
@@ -143,7 +177,7 @@ const FoodDetails: React.FC = () => {
           name={favoriteIconName}
           size={24}
           color="#FFB84D"
-          onPress={() => toggleFavorite()}
+          onPress={toggleFavorite}
         />
       ),
     });
