@@ -59,7 +59,12 @@ const Dashboard: React.FC = () => {
 
   useEffect(() => {
     async function loadFoods(): Promise<void> {
-      const { data: foodsData } = await api.get<Food[]>('foods');
+      const { data: foodsData } = await api.get<Food[]>('foods', {
+        params: {
+          category_like: selectedCategory,
+          name_like: searchValue,
+        },
+      });
 
       const foodsDataWithFormattedPrice = foodsData.map(food => ({
         ...food,
@@ -83,7 +88,12 @@ const Dashboard: React.FC = () => {
   }, []);
 
   function handleSelectCategory(id: number): void {
-    // Select / deselect category
+    if (id === selectedCategory) {
+      setSelectedCategory(undefined);
+      return;
+    }
+
+    setSelectedCategory(id);
   }
 
   return (
